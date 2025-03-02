@@ -33,9 +33,9 @@ def game_over():
     pygame.time.wait(2000)
 
 def main():
-    snake_list = []
+    snake_list = [(WIDTH // 2, HEIGHT // 2)]
     food_pos = (random.randint(0, WIDTH // SNAKE_SIZE) * SNAKE_SIZE, random.randint(0, HEIGHT // SNAKE_SIZE) * SNAKE_SIZE)
-    x_change, y_change = 0, 0
+    x_change, y_change = SNAKE_SIZE, 0
     score = 0
 
     while True:
@@ -58,14 +58,16 @@ def main():
         head_y = snake_list[-1][1] + y_change
         snake_head = (head_x, head_y)
 
-        if snake_head == food_pos:
+        if not snake_list:
+            snake_list.append(snake_head)
+        elif snake_head == food_pos:
             score += 1
             snake_list.append(snake_head)
             food_pos = (random.randint(0, WIDTH // SNAKE_SIZE) * SNAKE_SIZE, random.randint(0, HEIGHT // SNAKE_SIZE) * SNAKE_SIZE)
         else:
             snake_list.append(snake_head)
 
-            if len(snake_list) > score + 1:
+            if len(snake_list) > score + 2:
                 del snake_list[0]
 
         screen.fill(WHITE)
@@ -73,7 +75,14 @@ def main():
         draw_food(food_pos)
         pygame.display.update()
 
-        if head_x < 0 or head_x >= WIDTH or head_y < 0 or head_y >= HEIGHT or snake_head in snake_list[:-1]:
+        # Check for collision with boundaries and self
+        if (
+            head_x < 0
+            or head_x >= WIDTH
+            or head_y < 0
+            or head_y >= HEIGHT
+            or snake_head in snake_list[:-1]
+        ):
             game_over()
             break
 
